@@ -191,9 +191,9 @@ uv run pytest
 
 ## Development status
 
-The FastAPI foundation, typed settings, health endpoint, static-asset mounting, SQLite calendar schema, and deterministic demo seed/reset are in place. Calendar services, Retell integration, and Railway deployment remain pending.
+The FastAPI foundation, typed settings, health endpoint, static-asset mounting, SQLite calendar schema, deterministic demo seed/reset, and calendar availability lookup are in place. Booking, Retell integration, and Railway deployment remain pending.
 
-Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 004: Add the availability service](docs/tasks/004-add-availability-service.md).
+Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 005: Add the idempotent booking service](docs/tasks/005-add-idempotent-booking-service.md).
 
 ## References
 
