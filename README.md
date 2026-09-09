@@ -2,7 +2,7 @@
 
 A small, real Retell AI integration that demonstrates how a customer deployment can prevent duplicate appointments when a calendar operation succeeds, its response is lost, and Retell retries the request.
 
-> **Project status:** design and task planning are complete. Application implementation and end-to-end validation are still pending. Any result described below is a target acceptance criterion until a real Retell run is captured.
+> **Project status:** the FastAPI foundation is in place. Calendar services, Retell integration, and end-to-end validation are still pending. Any result described below is a target acceptance criterion until a real Retell run is captured.
 
 ## The customer problem
 
@@ -167,11 +167,33 @@ The project is complete when:
 - The public deployment survives a restart without losing the saved demonstration trace.
 - The walkthrough and README distinguish verified behavior from the product hypothesis.
 
+## Local setup
+
+The application requires Python 3.12. Install [uv](https://docs.astral.sh/uv/), then from the repository root:
+
+```bash
+uv sync --dev
+cp .env.example .env
+uv run uvicorn app.main:app --reload
+```
+
+Confirm the service is up with `GET /health`:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Run the current test suite:
+
+```bash
+uv run pytest
+```
+
 ## Development status
 
-Implementation has not started. Local installation, test, Retell setup, and Railway deployment commands will be added as their corresponding tasks are completed and verified.
+The FastAPI foundation, typed settings, health endpoint, and static-asset mounting are in place. Calendar services, Retell integration, and Railway deployment remain pending.
 
-Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Start with [Task 001: Bootstrap the FastAPI project](docs/tasks/001-bootstrap-fastapi-project.md).
+Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 002: Create the calendar schema](docs/tasks/002-create-calendar-schema.md).
 
 ## References
 
