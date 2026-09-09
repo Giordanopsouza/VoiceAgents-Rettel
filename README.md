@@ -2,7 +2,7 @@
 
 A small, real Retell AI integration that demonstrates how a customer deployment can prevent duplicate appointments when a calendar operation succeeds, its response is lost, and Retell retries the request.
 
-> **Project status:** the FastAPI foundation, SQLite calendar schema, deterministic demo seed/reset, availability lookup, idempotent booking, sanitized request-event timeline, and lost-response Failure Lab are in place. Retell integration and end-to-end validation are still pending. Any result described below is a target acceptance criterion until a real Retell run is captured.
+> **Project status:** the FastAPI foundation, SQLite calendar schema, deterministic demo seed/reset, availability lookup, idempotent booking, sanitized request-event timeline, lost-response Failure Lab, and Retell signature verification are in place. Retell tool endpoints, web-call creation, and end-to-end validation are still pending. Any result described below is a target acceptance criterion until a real Retell run is captured.
 
 ## The customer problem
 
@@ -191,9 +191,9 @@ uv run pytest
 
 ## Development status
 
-The FastAPI foundation, typed settings, health endpoint, static-asset mounting, SQLite calendar schema, deterministic demo seed/reset, calendar availability lookup, idempotent booking, sanitized request-event timeline, and lost-response Failure Lab are in place. Retell integration and Railway deployment remain pending.
+The FastAPI foundation, typed settings, health endpoint, static-asset mounting, SQLite calendar schema, deterministic demo seed/reset, calendar availability lookup, idempotent booking, sanitized request-event timeline, lost-response Failure Lab, and Retell `X-Retell-Signature` verification are in place. Retell tool endpoints, web-call creation, and Railway deployment remain pending.
 
-Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 008: Verify Retell custom-function requests](docs/tasks/008-verify-retell-webhooks.md).
+Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 009: Add the Retell availability custom function](docs/tasks/009-add-retell-availability-tool.md).
 
 ## References
 
