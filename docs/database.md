@@ -2,7 +2,7 @@
 
 SQLite file at `DATABASE_PATH` (`data/calendar.sqlite` locally; a persistent volume path on Railway). There is no tenant model and no Postgres/RLS: one process owns the file. The application creates missing tables on startup (`SQLAlchemy metadata.create_all`); there is no Alembic migration runner.
 
-Target after task 002: `appointment_slot`, `appointment`, `idempotency_record`, and `request_event`. Seed data is task 003. WAL mode and `BEGIN IMMEDIATE` on the booking path are part of how concurrent Retell retries stay serialized.
+Target after task 002: `appointment_slot`, `appointment`, `idempotency_record`, and `request_event`. Seed data (task 003) is the documented two-day Dr. Elena Voss schedule below; startup inserts it only when `appointment_slot` is empty. WAL mode and `BEGIN IMMEDIATE` on the booking path are part of how concurrent Retell retries stay serialized.
 
 Timestamps are ISO-8601 UTC text. Public IDs are stable strings (`SLOT-001`, `APT-001`), not autoincrement integers. Fictional patient names only: no phone, email, medical, or payment columns.
 
@@ -69,3 +69,20 @@ Quick reference
 | `request_event` | Sanitized evidence timeline. Many rows per call: receipt, idempotency decision, appointment result, response outcome (including `created_then_response_delayed` and replay). Dashboard result is computed from these rows. |
 
 slot vs appointment vs idempotency_record vs request_event: a **slot** is a time on the fictional calendar; an **appointment** is the booking that occupies one slot; an **idempotency_record** is the business lock that makes a retry return `APT-001` instead of inserting `APT-002`; a **request_event** is one inspectable step in the demo timeline. The unique key prevents duplicates. The event log explains that it happened.
+
+## Demo seed schedule
+
+One fictional dentist, **Dr. Elena Voss**, with 30-minute slots on **Monday 14 September 2026** and **Tuesday 15 September 2026**. Times are stored as UTC and spoken using the same clock values (`14:00` is "2:00 PM"). Occupied seed rows have no `appointment` row; they represent the clinic's pre-existing book.
+
+| Slot ID | Starts (UTC) | Ends (UTC) | Status |
+| --- | --- | --- | --- |
+| SLOT-001 | 2026-09-14T14:00:00Z | 2026-09-14T14:30:00Z | occupied |
+| SLOT-002 | 2026-09-14T14:30:00Z | 2026-09-14T15:00:00Z | available |
+| SLOT-003 | 2026-09-14T15:00:00Z | 2026-09-14T15:30:00Z | available |
+| SLOT-004 | 2026-09-14T15:30:00Z | 2026-09-14T16:00:00Z | occupied |
+| SLOT-005 | 2026-09-15T14:00:00Z | 2026-09-15T14:30:00Z | available |
+| SLOT-006 | 2026-09-15T14:30:00Z | 2026-09-15T15:00:00Z | occupied |
+| SLOT-007 | 2026-09-15T15:00:00Z | 2026-09-15T15:30:00Z | available |
+| SLOT-008 | 2026-09-15T15:30:00Z | 2026-09-15T16:00:00Z | available |
+
+`POST /api/demo/reset` deletes demo-created `appointment`, `idempotency_record`, and `request_event` rows and restores exactly this table. The endpoint returns 403 when `LIVE_DEMO_ENABLED=false` so a paused public deployment keeps its captured demonstration. Agent configuration (task 011) should describe this same dentist, date range, and clock times.

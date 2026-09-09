@@ -2,7 +2,7 @@
 
 A small, real Retell AI integration that demonstrates how a customer deployment can prevent duplicate appointments when a calendar operation succeeds, its response is lost, and Retell retries the request.
 
-> **Project status:** the FastAPI foundation and SQLite calendar schema are in place. Calendar services, Retell integration, and end-to-end validation are still pending. Any result described below is a target acceptance criterion until a real Retell run is captured.
+> **Project status:** the FastAPI foundation, SQLite calendar schema, and deterministic demo seed/reset are in place. Calendar services, Retell integration, and end-to-end validation are still pending. Any result described below is a target acceptance criterion until a real Retell run is captured.
 
 ## The customer problem
 
@@ -191,9 +191,9 @@ uv run pytest
 
 ## Development status
 
-The FastAPI foundation, typed settings, health endpoint, static-asset mounting, and SQLite calendar schema are in place. Calendar services, Retell integration, and Railway deployment remain pending.
+The FastAPI foundation, typed settings, health endpoint, static-asset mounting, SQLite calendar schema, and deterministic demo seed/reset are in place. Calendar services, Retell integration, and Railway deployment remain pending.
 
-Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 003: Seed and reset the demo calendar](docs/tasks/003-seed-and-reset-demo-calendar.md).
+Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 004: Add the availability service](docs/tasks/004-add-availability-service.md).
 
 ## References
 
