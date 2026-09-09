@@ -100,7 +100,12 @@ def test_tool_schema_requires_iso_date_argument():
     parameters = schema["parameters"]
 
     assert schema["name"] == "check_availability"
-    assert schema["http"] == {"method": "POST", "path": PATH}
+    assert schema["http"]["method"] == "POST"
+    assert schema["http"]["path"] == PATH
+    assert schema["http"]["url"] == "https://<PUBLIC_HOST>/retell/check_availability"
+    assert schema["http"]["timeout_ms"] == 10000
+    assert schema["http"]["max_retry"] == 0
+    assert schema["http"]["args_at_root"] is False
     assert parameters["type"] == "object"
     assert parameters["required"] == ["date"]
     assert parameters["properties"]["date"]["type"] == "string"

@@ -17,8 +17,8 @@ class SeedSlot:
     status: str
 
 
-# Canonical fictional schedule. Agent prompts in task 011 should describe
-# the same dentist, dates, and clock times. Stored timestamps are UTC;
+# Canonical fictional schedule. Agent prompts in retell/conversation-flow.md
+# describe the same dentist, dates, and clock times. Stored timestamps are UTC;
 # spoken times use the same clock values (14:00 is "2:00 PM").
 SEED_SLOTS: tuple[SeedSlot, ...] = (
     SeedSlot("SLOT-001", "2026-09-14T14:00:00Z", "2026-09-14T14:30:00Z", "occupied"),

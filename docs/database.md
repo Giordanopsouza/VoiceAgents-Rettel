@@ -85,4 +85,4 @@ One fictional dentist, **Dr. Elena Voss**, with 30-minute slots on **Monday 14 S
 | SLOT-007 | 2026-09-15T15:00:00Z | 2026-09-15T15:30:00Z | available |
 | SLOT-008 | 2026-09-15T15:30:00Z | 2026-09-15T16:00:00Z | available |
 
-`POST /api/demo/reset` deletes demo-created `appointment`, `idempotency_record`, and `request_event` rows and restores exactly this table. The endpoint returns 403 when `LIVE_DEMO_ENABLED=false` so a paused public deployment keeps its captured demonstration. Agent configuration (task 011) should describe this same dentist, date range, and clock times.
+`POST /api/demo/reset` deletes demo-created `appointment`, `idempotency_record`, and `request_event` rows and restores exactly this table. The endpoint returns 403 when `LIVE_DEMO_ENABLED=false` so a paused public deployment keeps its captured demonstration. The Retell agent in `retell/conversation-flow.md` describes this same dentist, date range, and clock times.

@@ -3,7 +3,19 @@
   "description": "Look up open fictional appointments with Dr. Elena Voss for one calendar date. Call this after the caller names a date. Only 2026-09-14 and 2026-09-15 have a schedule. Do not invent slots or send natural-language dates.",
   "http": {
     "method": "POST",
-    "path": "/retell/check_availability"
+    "path": "/retell/check_availability",
+    "url": "https://<PUBLIC_HOST>/retell/check_availability",
+    "timeout_ms": 10000,
+    "max_retry": 0,
+    "args_at_root": false,
+    "parameter_type": "json"
+  },
+  "function_node": {
+    "wait_for_result": true,
+    "speak_during_execution": true,
+    "speak_after_execution": false,
+    "execution_message_type": "static_text",
+    "execution_message": "Let me check Dr. Elena Voss's fictional schedule."
   },
   "parameters": {
     "type": "object",
