@@ -1,0 +1,37 @@
+stateDiagram-v2
+    [*] --> RequestReceived
+
+    RequestReceived --> Rejected: invalid signature or payload
+    RequestReceived --> KeyDerived: valid signed request
+
+    KeyDerived --> ExistingKey: idempotency key found
+    KeyDerived --> NewKey: idempotency key absent
+
+    ExistingKey --> ReplayReturned: stored payload matches
+    ExistingKey --> ConflictReturned: stored payload differs
+
+    NewKey --> SlotRejected: slot missing or occupied
+    NewKey --> AppointmentCommitted: slot open and transaction commits
+
+    AppointmentCommitted --> ResponseDelayed: Failure Lab enabled for first attempt
+    AppointmentCommitted --> CreatedReturned: normal mode
+
+    ResponseDelayed --> RetellTimedOut: delay exceeds configured timeout
+    RetellTimedOut --> RequestReceived: Retell retries
+
+    ReplayReturned --> [*]
+    ConflictReturned --> [*]
+    SlotRejected --> [*]
+    CreatedReturned --> [*]
+    Rejected --> [*]
+
+    note right of AppointmentCommitted
+        Database invariants:
+        one row per idempotency key
+        one active appointment per slot
+    end note
+
+    note right of ReplayReturned
+        The replay returns the original
+        appointment ID without another insert.
+    end note

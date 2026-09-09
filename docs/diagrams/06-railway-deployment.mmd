@@ -1,0 +1,49 @@
+flowchart TB
+    reviewer["Reviewer browser"]
+    retell["Retell AI cloud"]
+
+    subgraph railway["Railway project"]
+        ingress["Public HTTPS service"]
+
+        subgraph container["Single FastAPI container"]
+            static["Static engineering dashboard"]
+            api["Calendar and event APIs"]
+            retell_boundary["Signed Retell tool endpoints"]
+            call_endpoint["Create Web Call endpoint"]
+            controls["Live-call switch and rate limits"]
+        end
+
+        volume[("Persistent Railway volume")]
+        database[("SQLite database")]
+        variables["Railway variables"]
+    end
+
+    reviewer -->|"View dashboard and start call"| ingress
+    ingress --> static
+    ingress --> api
+    ingress --> controls
+    controls --> call_endpoint
+    call_endpoint -->|"RETELL_API_KEY"| retell
+    retell -->|"Signed custom-function requests"| ingress
+    ingress --> retell_boundary
+    api --> database
+    retell_boundary --> database
+    database --- volume
+    variables -.->|"RETELL_API_KEY, RETELL_AGENT_ID"| call_endpoint
+    variables -.->|"DATABASE_PATH"| database
+    variables -.->|"LIVE_DEMO_ENABLED and limits"| controls
+
+    public_note["Public: dashboard, health check, sanitized evidence"]
+    secret_note["Server only: API key, signature verification material, operator settings"]
+    public_note -.-> ingress
+    secret_note -.-> variables
+
+    classDef public fill:#e3f3ff,stroke:#1672a6,color:#082d42
+    classDef external fill:#e9e5ff,stroke:#5f4bb6,color:#211a52
+    classDef secret fill:#ffe8e8,stroke:#b23a3a,color:#4f1111
+    classDef data fill:#e5f6ea,stroke:#297a43,color:#10351d
+
+    class reviewer,ingress,static public
+    class retell external
+    class variables,secret_note secret
+    class volume,database data

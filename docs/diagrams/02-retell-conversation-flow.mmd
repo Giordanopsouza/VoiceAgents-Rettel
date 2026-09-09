@@ -1,0 +1,44 @@
+flowchart TD
+    start(["Web call starts"])
+    greet["Greet caller and explain fictional demo"]
+    collect["Collect fictional patient name and preferred date"]
+    check_tool[["Call check_availability"]]
+    any_slots{"Slots available?"}
+    alternatives["Offer available slots"]
+    no_slots["Explain no matching availability and request another date"]
+    select["Caller selects one slot"]
+    summarize["Repeat dentist, date, and time"]
+    confirmed{"Caller explicitly confirms?"}
+    revise["Ask what should change"]
+    book_tool[["Call book_appointment"]]
+    booked{"Booking result"}
+    success["Confirm the single verified appointment"]
+    recoverable["Explain the slot changed and offer another option"]
+    technical["Explain that booking could not be verified"]
+    finish(["End call"])
+
+    start --> greet --> collect --> check_tool --> any_slots
+    any_slots -->|"Yes"| alternatives --> select --> summarize --> confirmed
+    any_slots -->|"No"| no_slots --> collect
+    confirmed -->|"No"| revise --> collect
+    confirmed -->|"Yes"| book_tool --> booked
+    booked -->|"Created or idempotent replay"| success --> finish
+    booked -->|"Slot unavailable"| recoverable --> check_tool
+    booked -->|"Unverified failure"| technical --> finish
+
+    note1["The booking tool is unreachable until explicit confirmation"]
+    note2["A retry may return the original appointment; the agent confirms it once"]
+    note1 -.-> confirmed
+    note2 -.-> success
+
+    classDef action fill:#e3f3ff,stroke:#1672a6,color:#082d42
+    classDef decision fill:#fff3d6,stroke:#8a5a00,color:#2b1a00
+    classDef tool fill:#e9e5ff,stroke:#5f4bb6,color:#211a52
+    classDef terminal fill:#e5f6ea,stroke:#297a43,color:#10351d
+    classDef note fill:#f7f7f7,stroke:#777,color:#333,stroke-dasharray: 4 3
+
+    class greet,collect,alternatives,no_slots,select,summarize,revise,success,recoverable,technical action
+    class any_slots,confirmed,booked decision
+    class check_tool,book_tool tool
+    class start,finish terminal
+    class note1,note2 note

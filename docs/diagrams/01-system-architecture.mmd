@@ -1,0 +1,58 @@
+flowchart LR
+    reviewer["Reviewer"]
+
+    subgraph browser["Public engineering dashboard"]
+        video["Recorded walkthrough"]
+        call_ui["Retell web-call controls"]
+        calendar_ui["Dental schedule"]
+        failure_ui["Failure Lab switch"]
+        timeline_ui["Request timeline and invariant"]
+    end
+
+    subgraph retell_cloud["Retell AI"]
+        create_call["Create Web Call API"]
+        voice_agent["Dental booking agent"]
+        conversation_flow["Conversation Flow"]
+        tools["Custom-function runner"]
+    end
+
+    subgraph python_service["Python service on Railway"]
+        fastapi["FastAPI boundary"]
+        guardrails["Live-call switch and rate limits"]
+        signature["Retell signature verification"]
+        availability["Availability service"]
+        booking["Idempotent booking service"]
+        failure_lab["Lost-response injector"]
+        event_api["Sanitized event API"]
+    end
+
+    sqlite[("Persistent SQLite database")]
+
+    reviewer --> browser
+    call_ui -->|"Request a call"| guardrails
+    guardrails -->|"Server-held API key"| create_call
+    create_call --> voice_agent
+    voice_agent --> conversation_flow
+    conversation_flow --> tools
+    tools -->|"Signed HTTPS requests"| fastapi
+    fastapi --> signature
+    signature --> availability
+    signature --> booking
+    booking --> failure_lab
+    availability --> sqlite
+    booking --> sqlite
+    failure_lab --> sqlite
+    failure_ui --> failure_lab
+    calendar_ui --> availability
+    timeline_ui --> event_api
+    event_api --> sqlite
+
+    classDef person fill:#fff3d6,stroke:#8a5a00,color:#2b1a00
+    classDef external fill:#e9e5ff,stroke:#5f4bb6,color:#211a52
+    classDef service fill:#e3f3ff,stroke:#1672a6,color:#082d42
+    classDef data fill:#e5f6ea,stroke:#297a43,color:#10351d
+
+    class reviewer person
+    class create_call,voice_agent,conversation_flow,tools external
+    class fastapi,guardrails,signature,availability,booking,failure_lab,event_api service
+    class sqlite data

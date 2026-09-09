@@ -1,0 +1,34 @@
+sequenceDiagram
+    autonumber
+    actor Caller
+    participant Dashboard
+    participant Retell as Retell agent
+    participant API as FastAPI calendar
+    participant DB as SQLite
+
+    Caller->>Dashboard: Start web call
+    Dashboard->>API: POST /api/web-calls
+    API->>Retell: Create Web Call
+    Retell-->>API: Call credentials and call_id
+    API-->>Dashboard: Safe client session data
+    Dashboard->>Retell: Join voice session
+
+    Caller->>Retell: Ask for a dental appointment
+    Retell->>API: check_availability(date)
+    API->>DB: Read open slots
+    DB-->>API: Available slots
+    API-->>Retell: Speakable slots with stable IDs
+    Retell-->>Caller: Offer available times
+
+    Caller->>Retell: Select and confirm a slot
+    Retell->>API: book_appointment(call_id, slot, patient)
+    API->>API: Derive idempotency key
+    API->>DB: Transactionally create appointment
+    DB-->>API: APT-001 created
+    API-->>Retell: APT-001 confirmed
+    Retell-->>Caller: Confirm appointment once
+
+    Dashboard->>API: Poll sanitized events
+    API->>DB: Read demo evidence
+    DB-->>API: 1 attempt and 1 appointment
+    API-->>Dashboard: Normal booking result

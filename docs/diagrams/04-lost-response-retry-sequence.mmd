@@ -1,0 +1,42 @@
+sequenceDiagram
+    autonumber
+    actor Caller
+    participant Retell as Retell custom-function runner
+    participant API as FastAPI Failure Lab
+    participant DB as SQLite
+    participant UI as Engineering dashboard
+
+    Note over Caller,UI: Failure Lab is enabled before the call
+    Caller->>Retell: Confirm the selected appointment
+
+    rect rgb(255, 244, 224)
+        Retell->>+API: Attempt 1: book_appointment
+        API->>API: Verify X-Retell-Signature
+        API->>API: Derive idempotency key K
+        API->>DB: Begin transaction
+        DB-->>API: K does not exist and slot is open
+        API->>DB: Insert APT-001 and idempotency record K
+        API->>DB: Commit transaction
+        API->>DB: Record created_then_response_delayed
+        Note over API,Retell: The calendar succeeded, but its response is deliberately delayed
+        Retell--xAPI: Retell timeout expires
+    end
+
+    rect rgb(232, 247, 238)
+        Retell->>API: Attempt 2: retry same booking
+        API->>API: Verify X-Retell-Signature
+        API->>API: Derive the same key K
+        API->>DB: Look up idempotency record K
+        DB-->>API: Existing appointment APT-001
+        API->>DB: Record duplicate_returned
+        API-->>Retell: APT-001 confirmed as idempotent replay
+    end
+
+    Retell-->>Caller: Confirm APT-001 once
+    UI->>API: Fetch sanitized events and appointments
+    API->>DB: Read evidence
+    DB-->>API: 2 attempts and 1 appointment
+    API-->>UI: Shared key K and shared ID APT-001
+    Note over UI: Display: 2 API attempts · 1 appointment · duplicate prevented
+
+    API-->>-Retell: Delayed Attempt 1 response is no longer authoritative
