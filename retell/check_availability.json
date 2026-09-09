@@ -1,0 +1,19 @@
+{
+  "name": "check_availability",
+  "description": "Look up open fictional appointments with Dr. Elena Voss for one calendar date. Call this after the caller names a date. Only 2026-09-14 and 2026-09-15 have a schedule. Do not invent slots or send natural-language dates.",
+  "http": {
+    "method": "POST",
+    "path": "/retell/check_availability"
+  },
+  "parameters": {
+    "type": "object",
+    "required": ["date"],
+    "additionalProperties": false,
+    "properties": {
+      "date": {
+        "type": "string",
+        "description": "Appointment date as an ISO calendar date (YYYY-MM-DD). Only Monday 2026-09-14 and Tuesday 2026-09-15 are available."
+      }
+    }
+  }
+}
