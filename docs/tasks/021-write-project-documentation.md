@@ -1,7 +1,7 @@
 ---
 id: 021-write-project-documentation
 feature: presentation
-status: pending
+status: in-progress
 ---
 
 # Write the project documentation
@@ -25,3 +25,6 @@ Create a concise reviewer-facing README and supporting diagrams that explain the
 ## Log
 ### [PA] 2026-09-09 09:06 — Grooming
 Reserved a documentation pass after real behavior and deployment details are known.
+
+### [SWE] 2026-09-09 09:24 — Root README drafted
+Added the reviewer-facing project overview, target demonstration, architecture, safety boundaries, scope, success criteria, and links to the detailed Mermaid diagrams and task tracker. Reproducible setup and verified observed results remain pending implementation.
