@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dental Booking Reliability Lab</title>
+    <meta
+      name="description"
+      content="Engineering dashboard for a fictional Dr. Elena Voss dental booking demo with Retell AI."
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <!-- DASHBOARD_CONFIG -->
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to dashboard</a>
+
+    <header class="site-header" aria-labelledby="site-title">
+      <div class="site-header__intro">
+        <p class="eyebrow">Fictional customer scenario</p>
+        <h1 id="site-title">Bright Smile Dental · Dr. Elena Voss</h1>
+        <p class="lede">
+          A voice agent books fictional appointments for one dentist. When Retell
+          retries after a lost calendar response, idempotent booking must return
+          the same appointment—not create a duplicate.
+        </p>
+      </div>
+      <div
+        class="demo-banner"
+        id="demo-banner"
+        role="status"
+        aria-live="polite"
+        data-state="ready"
+      >
+        <span class="demo-banner__label">Demo status</span>
+        <p class="demo-banner__message" id="demo-banner-message">
+          Shell loaded. Live controls arrive in the next tasks.
+        </p>
+      </div>
+    </header>
+
+    <nav class="integration-path" aria-labelledby="integration-path-title">
+      <h2 id="integration-path-title">Integration path</h2>
+      <ol class="integration-path__steps">
+        <li>
+          <span class="step-label">Prepare</span>
+          Enable Failure Lab and confirm the seeded schedule.
+        </li>
+        <li>
+          <span class="step-label">Call</span>
+          Start a Retell web call with a fictional patient name.
+        </li>
+        <li>
+          <span class="step-label">Book</span>
+          Ask for Monday 14 or Tuesday 15 September 2026, pick a slot, and
+          confirm dentist, date, and time.
+        </li>
+        <li>
+          <span class="step-label">Prove</span>
+          Watch the timeline show two API attempts resolving to one appointment.
+        </li>
+      </ol>
+    </nav>
+
+    <main id="main-content" class="dashboard-grid">
+      <section
+        class="panel panel--call"
+        aria-labelledby="voice-call-title"
+        data-panel="voice-call"
+        data-state="empty"
+      >
+        <header class="panel__header">
+          <h2 id="voice-call-title">Voice call</h2>
+          <p class="panel__hint">Retell web call · microphone on explicit action</p>
+        </header>
+        <div class="panel__body">
+          <div class="state-view state-view--empty" data-view="empty">
+            <p>
+              Start a real conversation with the configured dental agent. Use a
+              fictional name only—no medical or contact details.
+            </p>
+          </div>
+          <div class="state-view state-view--loading" data-view="loading" hidden>
+            <p class="loading-indicator" aria-busy="true">
+              <span class="spinner" aria-hidden="true"></span>
+              Requesting call session from the server…
+            </p>
+          </div>
+          <div class="state-view state-view--ready" data-view="ready" hidden>
+            <p>Call session ready. Audio controls will appear here.</p>
+          </div>
+          <div class="state-view state-view--error" data-view="error" hidden>
+            <p role="alert">Could not start a web call. Check server configuration.</p>
+          </div>
+          <div class="panel__actions">
+            <button
+              type="button"
+              class="button button--primary"
+              id="start-call-button"
+              disabled
+              aria-describedby="start-call-help"
+            >
+              Start web call
+            </button>
+            <p class="panel__help" id="start-call-help">
+              Disabled in the shell. Task 016 wires Retell and microphone access.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="panel panel--schedule"
+        aria-labelledby="schedule-title"
+        data-panel="schedule"
+        data-state="empty"
+      >
+        <header class="panel__header">
+          <h2 id="schedule-title">Dental schedule</h2>
+          <p class="panel__hint">Seeded fictional slots · Monday &amp; Tuesday</p>
+        </header>
+        <div class="panel__body">
+          <div class="state-view state-view--empty" data-view="empty">
+            <p>
+              Available and occupied slots for Dr. Elena Voss will render here.
+              Occupied seed slots stay hidden from callers.
+            </p>
+          </div>
+          <div class="state-view state-view--loading" data-view="loading" hidden>
+            <p class="loading-indicator" aria-busy="true">
+              <span class="spinner" aria-hidden="true"></span>
+              Loading schedule…
+            </p>
+            <ul class="skeleton-list" aria-hidden="true">
+              <li></li>
+              <li></li>
+              <li></li>
+            </ul>
+          </div>
+          <div class="state-view state-view--ready" data-view="ready" hidden>
+            <p>Schedule loaded. Slot grid will appear here.</p>
+          </div>
+          <div class="state-view state-view--error" data-view="error" hidden>
+            <p role="alert">Could not load the schedule. Try again after reset.</p>
+          </div>
+          <div class="panel__actions">
+            <button
+              type="button"
+              class="button button--secondary"
+              id="reset-schedule-button"
+              disabled
+              aria-describedby="reset-schedule-help"
+            >
+              Reset demo calendar
+            </button>
+            <p class="panel__help" id="reset-schedule-help">
+              Restores the deterministic seed when live demo guardrails allow it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="panel panel--failure-lab"
+        aria-labelledby="failure-lab-title"
+        data-panel="failure-lab"
+        data-state="empty"
+      >
+        <header class="panel__header">
+          <h2 id="failure-lab-title">Failure Lab</h2>
+          <p class="panel__hint">Lost-response injector for the first booking</p>
+        </header>
+        <div class="panel__body">
+          <div class="state-view state-view--empty" data-view="empty">
+            <p>
+              When enabled, the first successful booking for an idempotency key
+              sleeps past Retell&apos;s timeout so the platform retries with the
+              same details.
+            </p>
+          </div>
+          <div class="state-view state-view--loading" data-view="loading" hidden>
+            <p class="loading-indicator" aria-busy="true">
+              <span class="spinner" aria-hidden="true"></span>
+              Syncing Failure Lab state…
+            </p>
+          </div>
+          <div class="state-view state-view--ready" data-view="ready" hidden>
+            <label class="toggle" for="failure-lab-switch">
+              <input
+                type="checkbox"
+                id="failure-lab-switch"
+                role="switch"
+                disabled
+                aria-describedby="failure-lab-help"
+              />
+              <span class="toggle__track" aria-hidden="true"></span>
+              <span class="toggle__label">Inject lost response</span>
+            </label>
+            <p class="panel__help" id="failure-lab-help">
+              Timeout 2s · delay 3s · matches Retell booking function settings.
+            </p>
+          </div>
+          <div class="state-view state-view--error" data-view="error" hidden>
+            <p role="alert">Could not read Failure Lab status from the server.</p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="panel panel--timeline"
+        aria-labelledby="timeline-title"
+        data-panel="timeline"
+        data-state="empty"
+      >
+        <header class="panel__header">
+          <h2 id="timeline-title">Request timeline</h2>
+          <p class="panel__hint">Sanitized Retell function attempts</p>
+        </header>
+        <div class="panel__body">
+          <div class="state-view state-view--empty" data-view="empty">
+            <p>
+              Each booking attempt will list its number, timing, outcome,
+              shortened idempotency key, and appointment ID.
+            </p>
+          </div>
+          <div class="state-view state-view--loading" data-view="loading" hidden>
+            <p class="loading-indicator" aria-busy="true">
+              <span class="spinner" aria-hidden="true"></span>
+              Waiting for request events…
+            </p>
+          </div>
+          <div class="state-view state-view--ready" data-view="ready" hidden>
+            <ol class="timeline-list" id="timeline-list" aria-label="Request events">
+              <li>Events will stream here during a demo.</li>
+            </ol>
+          </div>
+          <div class="state-view state-view--error" data-view="error" hidden>
+            <p role="alert">Could not load the event timeline.</p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="panel panel--result panel--wide"
+        aria-labelledby="result-title"
+        data-panel="reliability-result"
+        data-state="empty"
+      >
+        <header class="panel__header">
+          <h2 id="result-title">Reliability result</h2>
+          <p class="panel__hint">Evidence-derived · never hard-coded</p>
+        </header>
+        <div class="panel__body">
+          <div class="state-view state-view--empty" data-view="empty">
+            <p class="result-placeholder">
+              Run a Failure Lab booking to compute the invariant from backend
+              evidence.
+            </p>
+            <p class="result-example" aria-label="Example success copy">
+              Example when supported:
+              <strong>2 API attempts · 1 appointment · duplicate prevented</strong>
+            </p>
+          </div>
+          <div class="state-view state-view--loading" data-view="loading" hidden>
+            <p class="loading-indicator" aria-busy="true">
+              <span class="spinner" aria-hidden="true"></span>
+              Calculating result from events…
+            </p>
+          </div>
+          <div class="state-view state-view--ready" data-view="ready" hidden>
+            <p class="result-summary" id="result-summary" aria-live="polite"></p>
+          </div>
+          <div class="state-view state-view--error" data-view="error" hidden>
+            <p role="alert">
+              Incomplete or contradictory evidence. No success claim is shown.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        Fictional demonstration only. No real patient data, payments, or contact
+        collection.
+      </p>
+    </footer>
+
+    <script src="/static/dashboard.js" defer></script>
+  </body>
+</html>

@@ -1,8 +1,10 @@
+import json
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import sessionmaker
 
@@ -47,6 +49,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @application.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @application.get("/", response_class=HTMLResponse)
+    def dashboard(request: Request) -> HTMLResponse:
+        index_path = STATIC_DIR / "index.html"
+        content = index_path.read_text(encoding="utf-8")
+        config = json.dumps(
+            {"liveDemoEnabled": request.app.state.settings.live_demo_enabled}
+        )
+        config_script = (
+            f'<script id="dashboard-config" type="application/json">{config}</script>'
+        )
+        content = content.replace("<!-- DASHBOARD_CONFIG -->", config_script)
+        return HTMLResponse(content)
 
     @application.get("/api/availability")
     def get_availability(request: Request, date: str | None = None) -> dict:
