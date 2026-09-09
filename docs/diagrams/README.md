@@ -9,4 +9,6 @@ These Mermaid source files describe the Retell dental-booking prototype from com
 5. [`05-booking-state-model.mmd`](05-booking-state-model.mmd) — backend states and invariant-preserving decisions.
 6. [`06-railway-deployment.mmd`](06-railway-deployment.mmd) — public deployment and secret boundaries.
 
+The SQLite schema, column list, and uniqueness invariants live in [`docs/database.md`](../database.md).
+
 Render any source file with a Mermaid-compatible editor or CLI. The `.mmd` files remain the canonical versions.

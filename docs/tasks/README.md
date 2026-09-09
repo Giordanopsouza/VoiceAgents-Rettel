@@ -8,12 +8,13 @@ File-based task tracker (`TRACKER_MODE: file`). **One markdown file per atomic t
 
 ```
 tasks/
-├── 001-bootstrap-tui.md        # status: done
+├── done/
+│   └── 001-bootstrap-tui.md    # status: done
 ├── 002-agent-loop.md           # status: in-progress
 └── 003-bash-tool.md            # status: pending
 ```
 
-State lives in the `status:` frontmatter field — **not** in the filename. There is no `done/` folder and no renaming; you edit the field in place.
+State lives in the `status:` frontmatter field. Completed tasks are moved into `tasks/done/` without renaming the file.
 
 ## Task file shape
 
@@ -46,7 +47,7 @@ One atomic, independently-shippable unit of work (1–2 sentences).
 
 - **PA** grooming writes the file with `status: pending`.
 - **SWE** starts it → `status: in-progress`.
-- After the **Tester** PASSES and the task is committed → `status: done`.
+- After the **Tester** PASSES and the task is committed → `status: done`, then move the file into `tasks/done/`.
 
 Every agent **appends** (never rewrites) a timestamped entry to `## Log`: `### [ROLE] YYYY-MM-DD HH:MM — subject`. Roles: `PA`, `SWE`, `Tester`, `PR Reviewer`, `On-Call`.
 

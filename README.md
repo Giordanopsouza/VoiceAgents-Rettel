@@ -2,7 +2,7 @@
 
 A small, real Retell AI integration that demonstrates how a customer deployment can prevent duplicate appointments when a calendar operation succeeds, its response is lost, and Retell retries the request.
 
-> **Project status:** the FastAPI foundation is in place. Calendar services, Retell integration, and end-to-end validation are still pending. Any result described below is a target acceptance criterion until a real Retell run is captured.
+> **Project status:** the FastAPI foundation and SQLite calendar schema are in place. Calendar services, Retell integration, and end-to-end validation are still pending. Any result described below is a target acceptance criterion until a real Retell run is captured.
 
 ## The customer problem
 
@@ -88,7 +88,7 @@ The prototype uses one deployable Python service:
 | Retell AI | Real web call, Conversation Flow, voice interaction, custom-function execution, timeout, and retry |
 | Railway | Public HTTPS service, persistent volume, health checking, and server-side configuration |
 
-Detailed views are available in [docs/diagrams](docs/diagrams/README.md):
+The SQLite tables, columns, and booking invariants are in [docs/database.md](docs/database.md). Detailed views are available in [docs/diagrams](docs/diagrams/README.md):
 
 - [System architecture](docs/diagrams/01-system-architecture.mmd)
 - [Retell Conversation Flow](docs/diagrams/02-retell-conversation-flow.mmd)
@@ -191,9 +191,9 @@ uv run pytest
 
 ## Development status
 
-The FastAPI foundation, typed settings, health endpoint, and static-asset mounting are in place. Calendar services, Retell integration, and Railway deployment remain pending.
+The FastAPI foundation, typed settings, health endpoint, static-asset mounting, and SQLite calendar schema are in place. Calendar services, Retell integration, and Railway deployment remain pending.
 
-Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 002: Create the calendar schema](docs/tasks/002-create-calendar-schema.md).
+Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 003: Seed and reset the demo calendar](docs/tasks/003-seed-and-reset-demo-calendar.md).
 
 ## References
 
