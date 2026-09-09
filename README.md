@@ -2,7 +2,7 @@
 
 A small, real Retell AI integration that demonstrates how a customer deployment can prevent duplicate appointments when a calendar operation succeeds, its response is lost, and Retell retries the request.
 
-> **Project status:** the FastAPI foundation, SQLite calendar schema, deterministic demo seed/reset, availability lookup, idempotent booking, sanitized request-event timeline, lost-response Failure Lab, Retell signature verification, and the signed `check_availability` and `book_appointment` custom functions are in place. Web-call creation and end-to-end validation are still pending. Any result described below is a target acceptance criterion until a real Retell run is captured.
+> **Project status:** the FastAPI foundation, SQLite calendar schema, deterministic demo seed/reset, availability lookup, idempotent booking, sanitized request-event timeline, lost-response Failure Lab, Retell signature verification, signed custom functions, and version-controlled Conversation Flow assets are in place. Web-call creation and end-to-end validation are still pending. Any result described below is a target acceptance criterion until a real Retell run is captured.
 
 ## The customer problem
 
@@ -106,7 +106,7 @@ The finished prototype will use Retell at both important boundaries:
 - The backend will verify `X-Retell-Signature` against the exact raw request body before reading or changing calendar state.
 - The lost response will exceed Retell's explicitly configured custom-function timeout so that Retell performs the retry being demonstrated.
 
-The agent itself will be configured manually in Retell's dashboard. Its prompts, tool schemas, node transitions, timeout, retry count, and recreation steps will be stored in this repository.
+The agent itself is configured manually in Retell's dashboard. Its prompts, tool schemas, node transitions, timeout, retry count, and recreation steps live in [`retell/conversation-flow.md`](retell/conversation-flow.md).
 
 ## Technology
 
@@ -191,12 +191,13 @@ uv run pytest
 
 ## Development status
 
-The FastAPI foundation, typed settings, health endpoint, static-asset mounting, SQLite calendar schema, deterministic demo seed/reset, calendar availability lookup, idempotent booking, sanitized request-event timeline, lost-response Failure Lab, Retell `X-Retell-Signature` verification, and the signed `POST /retell/check_availability` and `POST /retell/book_appointment` tools are in place. Web-call creation and Railway deployment remain pending.
+The FastAPI foundation, typed settings, health endpoint, static-asset mounting, SQLite calendar schema, deterministic demo seed/reset, calendar availability lookup, idempotent booking, sanitized request-event timeline, lost-response Failure Lab, Retell `X-Retell-Signature` verification, signed `POST /retell/check_availability` and `POST /retell/book_appointment` tools, and version-controlled Conversation Flow assets are in place. Web-call creation and Railway deployment remain pending.
 
-Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 011: Define the Retell Conversation Flow assets](docs/tasks/011-document-retell-conversation-flow.md).
+Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 012: Create the server-side web-call endpoint](docs/tasks/012-create-web-call-endpoint.md).
 
 ## References
 
+- [Conversation Flow assets](retell/conversation-flow.md)
 - [Retell custom functions](https://docs.retellai.com/build/conversation-flow/custom-function)
 - [Retell Conversation Flow](https://docs.retellai.com/build/conversation-flow/overview)
 - [Retell Create Web Call API](https://docs.retellai.com/api-references/create-web-call)

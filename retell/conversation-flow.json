@@ -1,0 +1,270 @@
+{
+  "name": "Dental Booking Reliability Lab",
+  "response_engine": "conversation-flow",
+  "start_speaker": "agent",
+  "start_node_id": "greet",
+  "language": "en-US",
+  "model_choice": {
+    "type": "cascading",
+    "model": "gpt-4.1"
+  },
+  "llm_temperature": 0.3,
+  "flex_mode": false,
+  "dashboard": {
+    "voice": "Any English voice. Do not override voice or model on individual nodes.",
+    "knowledge_base": "none",
+    "post_call_extraction": "none",
+    "end_call_on_silence_seconds": 30,
+    "max_call_duration_seconds": 300,
+    "boosted_keywords": [
+      "Elena",
+      "Voss",
+      "Jordan Hale",
+      "Monday",
+      "Tuesday"
+    ]
+  },
+  "timeout_contract": {
+    "booking_timeout_ms": 2000,
+    "booking_max_retry": 1,
+    "availability_timeout_ms": 10000,
+    "availability_max_retry": 0,
+    "failure_lab_delay_ms": 3000,
+    "note": "book_appointment timeout_ms must stay shorter than Failure Lab's first-response delay so Retell retries after the injected lost response."
+  },
+  "global_prompt": "You are a fictional dental-office assistant in a public engineering demonstration. This is not a real clinic.\n\nIdentity:\n- You book fictional appointments with one dentist: Dr. Elena Voss.\n- The only dates with a schedule are Monday 14 September 2026 (2026-09-14) and Tuesday 15 September 2026 (2026-09-15).\n- Appointment times are 30-minute slots. Speak the same clock values the calendar uses: 14:00 is \"2:00 PM\", 14:30 is \"2:30 PM\", 15:00 is \"3:00 PM\", 15:30 is \"3:30 PM\".\n\nDemo rules:\n- Say this is a fictional demonstration in the greeting.\n- Collect only a fictional patient name. Suggest Jordan Hale if the caller does not have one.\n- Never request a phone number, email address, mailing address, payment information, insurance, or any medical or dental history.\n- Never invent appointment slots. Speak only slots returned by check_availability, using each slot's time_label and id.\n- Convert spoken dates to ISO calendar dates (YYYY-MM-DD) before calling check_availability. Do not send Monday, Tuesday, or other natural-language dates as the date argument.\n- Call book_appointment only from the booking function node after the caller explicitly confirms dentist, date, and time. Send confirmed=true, dentist_name=\"Dr. Elena Voss\", the chosen slot_id, and the fictional patient name.\n- After a successful or replayed booking, tell the caller the appointment ID once. Do not ask them to confirm again. A retry may return the original appointment; that is still one booking.\n\nIf the caller asks for another dentist, another date range, cancellation, or rescheduling, explain that this demonstration only books new fictional appointments with Dr. Elena Voss on 14 or 15 September 2026.",
+  "tools": [
+    {
+      "schema": "check_availability.json",
+      "name": "check_availability"
+    },
+    {
+      "schema": "book_appointment.json",
+      "name": "book_appointment"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "greet",
+      "name": "Greet",
+      "type": "conversation",
+      "skip_response": true,
+      "instruction": {
+        "type": "static_text",
+        "text": "Hi, this is a fictional dental booking demonstration, not a real clinic. I can check availability and book a pretend appointment with Dr. Elena Voss. I will not ask for contact, payment, or medical information."
+      }
+    },
+    {
+      "id": "collect",
+      "name": "Collect details",
+      "type": "conversation",
+      "skip_response": false,
+      "instruction": {
+        "type": "prompt",
+        "text": "Ask for a fictional patient name and which date they prefer. Only Monday 14 September 2026 and Tuesday 15 September 2026 have a schedule. If they do not offer a name, suggest Jordan Hale. Do not collect phone, email, payment, or medical details. When you have a fictional name and a preferred date, convert the date to YYYY-MM-DD."
+      }
+    },
+    {
+      "id": "check_availability",
+      "name": "Look up availability",
+      "type": "function",
+      "tool": "check_availability",
+      "wait_for_result": true,
+      "speak_during_execution": true,
+      "speak_after_execution": false,
+      "instruction": {
+        "type": "static_text",
+        "text": "Let me check Dr. Elena Voss's fictional schedule."
+      }
+    },
+    {
+      "id": "no_slots",
+      "name": "No matching availability",
+      "type": "conversation",
+      "skip_response": false,
+      "instruction": {
+        "type": "prompt",
+        "text": "Explain that this fictional clinic has no open appointments on that date. Speak the tool message when one is present. Ask the caller to pick Monday 14 September 2026 or Tuesday 15 September 2026. Do not invent slots."
+      }
+    },
+    {
+      "id": "offer_slots",
+      "name": "Offer and select a slot",
+      "type": "conversation",
+      "skip_response": false,
+      "instruction": {
+        "type": "prompt",
+        "text": "Offer every returned slot using its time_label. Mention Dr. Elena Voss and the date_label. Ask the caller to pick one time. Remember the chosen slot_id. Do not invent times or skip confirmation."
+      }
+    },
+    {
+      "id": "confirm",
+      "name": "Confirm dentist, date, and time",
+      "type": "conversation",
+      "skip_response": false,
+      "instruction": {
+        "type": "prompt",
+        "text": "Repeat Dr. Elena Voss, the date_label, and the time_label. Ask the caller to confirm that exact fictional appointment. Stay in this node until they clearly say yes or ask to change something. Do not call book_appointment from this node."
+      }
+    },
+    {
+      "id": "revise",
+      "name": "Revise the request",
+      "type": "conversation",
+      "skip_response": false,
+      "instruction": {
+        "type": "prompt",
+        "text": "Ask what should change: the date, the time, or the fictional patient name. Do not book anything. Then collect the updated details."
+      }
+    },
+    {
+      "id": "book_appointment",
+      "name": "Book appointment",
+      "type": "function",
+      "tool": "book_appointment",
+      "wait_for_result": true,
+      "speak_during_execution": true,
+      "speak_after_execution": false,
+      "instruction": {
+        "type": "static_text",
+        "text": "One moment, I am booking that fictional appointment."
+      }
+    },
+    {
+      "id": "success",
+      "name": "Confirm the verified appointment",
+      "type": "conversation",
+      "skip_response": true,
+      "instruction": {
+        "type": "prompt",
+        "text": "Tell the caller once that the fictional appointment is booked. Speak the appointment_id, Dr. Elena Voss, date_label, and time_label from the tool result. If replayed is true, confirm that same appointment once. Do not ask them to confirm again."
+      }
+    },
+    {
+      "id": "recoverable",
+      "name": "Slot no longer open",
+      "type": "conversation",
+      "skip_response": false,
+      "instruction": {
+        "type": "prompt",
+        "text": "Explain that the selected slot is no longer open. Offer to check availability again. Do not claim an appointment was created."
+      }
+    },
+    {
+      "id": "technical",
+      "name": "Booking could not be verified",
+      "type": "conversation",
+      "skip_response": true,
+      "instruction": {
+        "type": "prompt",
+        "text": "Explain that the fictional booking could not be verified and they can try again from the dashboard. Do not claim an appointment was created."
+      }
+    },
+    {
+      "id": "end_success",
+      "name": "End after booking",
+      "type": "end",
+      "speak_during_execution": true,
+      "instruction": {
+        "type": "static_text",
+        "text": "Thanks for trying this fictional demonstration. Goodbye."
+      }
+    },
+    {
+      "id": "end_unverified",
+      "name": "End after unverified booking",
+      "type": "end",
+      "speak_during_execution": true,
+      "instruction": {
+        "type": "static_text",
+        "text": "Thanks for trying this fictional demonstration. Goodbye."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "greet",
+      "to": "collect",
+      "kind": "skip_response"
+    },
+    {
+      "from": "collect",
+      "to": "check_availability",
+      "kind": "prompt",
+      "condition": "Caller provided a fictional patient name and a preferred date."
+    },
+    {
+      "from": "check_availability",
+      "to": "offer_slots",
+      "kind": "prompt",
+      "condition": "Function result has ok true and at least one slot."
+    },
+    {
+      "from": "check_availability",
+      "to": "no_slots",
+      "kind": "else"
+    },
+    {
+      "from": "no_slots",
+      "to": "collect",
+      "kind": "prompt",
+      "condition": "Caller is ready to try another date."
+    },
+    {
+      "from": "offer_slots",
+      "to": "confirm",
+      "kind": "prompt",
+      "condition": "Caller selected one of the offered slots."
+    },
+    {
+      "from": "confirm",
+      "to": "book_appointment",
+      "kind": "prompt",
+      "condition": "Caller explicitly confirmed the dentist, date, and time."
+    },
+    {
+      "from": "confirm",
+      "to": "revise",
+      "kind": "prompt",
+      "condition": "Caller did not confirm and wants a different dentist, date, or time."
+    },
+    {
+      "from": "revise",
+      "to": "collect",
+      "kind": "always"
+    },
+    {
+      "from": "book_appointment",
+      "to": "success",
+      "kind": "prompt",
+      "condition": "Function result has ok true. This includes a newly created appointment and an idempotent replay of the same appointment."
+    },
+    {
+      "from": "book_appointment",
+      "to": "recoverable",
+      "kind": "prompt",
+      "condition": "Function result error is slot_unavailable."
+    },
+    {
+      "from": "book_appointment",
+      "to": "technical",
+      "kind": "else"
+    },
+    {
+      "from": "success",
+      "to": "end_success",
+      "kind": "skip_response"
+    },
+    {
+      "from": "recoverable",
+      "to": "check_availability",
+      "kind": "prompt",
+      "condition": "Caller wants to see other open times."
+    },
+    {
+      "from": "technical",
+      "to": "end_unverified",
+      "kind": "skip_response"
+    }
+  ]
+}

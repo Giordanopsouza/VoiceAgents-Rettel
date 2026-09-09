@@ -3,7 +3,7 @@
 These Mermaid source files describe the Retell dental-booking prototype from complementary viewpoints:
 
 1. [`01-system-architecture.mmd`](01-system-architecture.mmd) — components and trust boundaries.
-2. [`02-retell-conversation-flow.mmd`](02-retell-conversation-flow.mmd) — what the voice agent does during a call.
+2. [`02-retell-conversation-flow.mmd`](02-retell-conversation-flow.mmd) — what the voice agent does during a call. Recreate the dashboard agent from [`retell/conversation-flow.md`](../retell/conversation-flow.md).
 3. [`03-normal-booking-sequence.mmd`](03-normal-booking-sequence.mmd) — the successful one-request path.
 4. [`04-lost-response-retry-sequence.mmd`](04-lost-response-retry-sequence.mmd) — the central two-attempt, one-appointment demonstration.
 5. [`05-booking-state-model.mmd`](05-booking-state-model.mmd) — backend states and invariant-preserving decisions.

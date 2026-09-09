@@ -131,7 +131,12 @@ def test_tool_schema_requires_explicit_confirmation_data():
     parameters = schema["parameters"]
 
     assert schema["name"] == "book_appointment"
-    assert schema["http"] == {"method": "POST", "path": PATH}
+    assert schema["http"]["method"] == "POST"
+    assert schema["http"]["path"] == PATH
+    assert schema["http"]["url"] == "https://<PUBLIC_HOST>/retell/book_appointment"
+    assert schema["http"]["timeout_ms"] == 2000
+    assert schema["http"]["max_retry"] == 1
+    assert schema["http"]["args_at_root"] is False
     assert parameters["type"] == "object"
     assert parameters["required"] == [
         "slot_id",
