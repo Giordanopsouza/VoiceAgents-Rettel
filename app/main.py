@@ -15,6 +15,7 @@ from app.retell_availability import register_retell_availability
 from app.retell_booking import register_retell_booking
 from app.seed import reset_calendar, schedule_payload, seed_if_empty
 from app.settings import Settings, get_settings
+from app.web_calls import WebCallError, create_web_call
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = ROOT_DIR / "static"
@@ -70,6 +71,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @application.put("/api/failure-lab")
     def put_failure_lab(request: Request, body: FailureLabToggle) -> dict:
         return request.app.state.failure_lab.set_enabled(body.enabled)
+
+    @application.post("/api/web-calls")
+    def post_web_call(request: Request) -> dict[str, str]:
+        try:
+            return create_web_call(request.app.state.settings)
+        except WebCallError as exc:
+            raise HTTPException(
+                status_code=exc.status_code,
+                detail={"error": exc.error, "message": exc.message},
+            ) from exc
 
     @application.post("/api/demo/reset")
     def reset_demo(request: Request) -> dict:
