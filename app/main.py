@@ -12,6 +12,7 @@ from app.events import list_request_events
 from app.failure_lab import FailureLab, FailureLabToggle
 from app.retell_auth import retell_router
 from app.retell_availability import register_retell_availability
+from app.retell_booking import register_retell_booking
 from app.seed import reset_calendar, schedule_payload, seed_if_empty
 from app.settings import Settings, get_settings
 
@@ -86,6 +87,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"status": "reset", **payload}
 
     register_retell_availability(retell_router)
+    register_retell_booking(retell_router)
     application.include_router(retell_router)
     application.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
     return application

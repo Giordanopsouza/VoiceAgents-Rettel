@@ -1,0 +1,31 @@
+{
+  "name": "book_appointment",
+  "description": "Create a fictional appointment with Dr. Elena Voss only after the caller explicitly confirms the dentist, date, and time. Pass the confirmed slot ID from check_availability and a fictional patient name. Do not collect phone, email, payment, or medical information. Do not call this to guess a slot or to ask for another verbal confirmation after a successful or replayed booking.",
+  "http": {
+    "method": "POST",
+    "path": "/retell/book_appointment"
+  },
+  "parameters": {
+    "type": "object",
+    "required": ["slot_id", "patient_name", "dentist_name", "confirmed"],
+    "additionalProperties": false,
+    "properties": {
+      "slot_id": {
+        "type": "string",
+        "description": "Stable slot ID returned by check_availability (for example SLOT-002). This is the confirmed date and time."
+      },
+      "patient_name": {
+        "type": "string",
+        "description": "Fictional patient name only. Do not send a phone number, email address, or medical details."
+      },
+      "dentist_name": {
+        "type": "string",
+        "description": "Dentist the caller confirmed. Must be Dr. Elena Voss."
+      },
+      "confirmed": {
+        "type": "boolean",
+        "description": "True only after the caller explicitly confirmed dentist, date, and time. Do not call this function when confirmed is false."
+      }
+    }
+  }
+}
