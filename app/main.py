@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from app.availability import AvailabilityQueryError, list_available_slots
 from app.db import init_db
 from app.events import list_request_events
+from app.failure_lab import FailureLab, FailureLabToggle
 from app.seed import reset_calendar, schedule_payload, seed_if_empty
 from app.settings import Settings, get_settings
 
@@ -34,6 +35,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     application.state.settings = settings or get_settings()
+    application.state.failure_lab = FailureLab(
+        timeout_seconds=application.state.settings.retell_function_timeout_seconds,
+        delay_seconds=application.state.settings.failure_lab_delay_seconds,
+    )
 
     @application.get("/health")
     def health() -> dict[str, str]:
@@ -55,6 +60,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         with request.app.state.session_factory() as session:
             return {"events": list_request_events(session)}
 
+    @application.get("/api/failure-lab")
+    def get_failure_lab(request: Request) -> dict:
+        return request.app.state.failure_lab.snapshot()
+
+    @application.put("/api/failure-lab")
+    def put_failure_lab(request: Request, body: FailureLabToggle) -> dict:
+        return request.app.state.failure_lab.set_enabled(body.enabled)
+
     @application.post("/api/demo/reset")
     def reset_demo(request: Request) -> dict:
         if not request.app.state.settings.live_demo_enabled:
@@ -67,6 +80,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         with request.app.state.session_factory() as session:
             reset_calendar(session)
             payload = schedule_payload(session)
+        request.app.state.failure_lab.reset_attempts()
         return {"status": "reset", **payload}
 
     application.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")

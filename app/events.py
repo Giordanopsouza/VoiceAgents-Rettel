@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.availability import AvailabilityQueryError, list_available_slots
 from app.booking import BookingError, book_appointment
+from app.failure_lab import FailureLab
 from app.models import RequestEvent
 
 _SAFE_IDENTIFIER = re.compile(r"^[A-Za-z0-9_.:-]{1,128}$")
@@ -35,12 +36,18 @@ def record_booking_attempt(
     idempotency_key: object,
     slot_id: object,
     patient_name: object,
+    failure_lab: FailureLab | None = None,
 ) -> dict:
     """Book an appointment and persist the sanitized attempt timeline.
 
     Calendar creation stays in `book_appointment`. This wrapper records
     receipt, idempotency decision, appointment result, and response outcome
     so the dashboard can explain retries without storing sensitive payloads.
+
+    When Failure Lab is enabled, a first successful create records
+    `created_then_response_delayed` and then sleeps. The appointment and
+    events are committed before that wait so a concurrent retry can return
+    `duplicate_returned` without blocking on the delayed response.
     """
     safe_call_id = _safe_correlation_id(call_id)
     safe_key = _safe_correlation_id(idempotency_key)
@@ -77,6 +84,11 @@ def record_booking_attempt(
 
     appointment_id = result["appointment"]["id"]
     replayed = result["replayed"]
+    delayed = False
+    if failure_lab is not None and not replayed:
+        delay_key = safe_key or _delay_key(idempotency_key)
+        delayed = failure_lab.claim_delay(delay_key)
+    response_outcome = _booking_response_outcome(replayed=replayed, delayed=delayed)
     _persist_booking_followup(
         session,
         attempt_number=attempt_number,
@@ -85,8 +97,10 @@ def record_booking_attempt(
         appointment_id=appointment_id,
         decision="existing_key" if replayed else "new_key",
         appointment_outcome="replayed" if replayed else "created",
-        response_outcome="duplicate_returned" if replayed else "created_returned",
+        response_outcome=response_outcome,
     )
+    if failure_lab is not None:
+        failure_lab.wait_if_delayed(delayed)
     return result
 
 
@@ -249,6 +263,21 @@ def _booking_error_outcomes(error: str) -> tuple[str, str, str]:
     return _BOOKING_ERROR_EVENTS.get(
         error, ("invalid", "rejected", "invalid_request")
     )
+
+
+def _booking_response_outcome(*, replayed: bool, delayed: bool) -> str:
+    if delayed:
+        return "created_then_response_delayed"
+    if replayed:
+        return "duplicate_returned"
+    return "created_returned"
+
+
+def _delay_key(idempotency_key: object) -> str | None:
+    if not isinstance(idempotency_key, str):
+        return None
+    stripped = idempotency_key.strip()
+    return stripped or None
 
 
 def _safe_correlation_id(value: object) -> str | None:

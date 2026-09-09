@@ -2,7 +2,7 @@
 
 A small, real Retell AI integration that demonstrates how a customer deployment can prevent duplicate appointments when a calendar operation succeeds, its response is lost, and Retell retries the request.
 
-> **Project status:** the FastAPI foundation, SQLite calendar schema, deterministic demo seed/reset, availability lookup, idempotent booking, and sanitized request-event timeline are in place. Retell integration and end-to-end validation are still pending. Any result described below is a target acceptance criterion until a real Retell run is captured.
+> **Project status:** the FastAPI foundation, SQLite calendar schema, deterministic demo seed/reset, availability lookup, idempotent booking, sanitized request-event timeline, and lost-response Failure Lab are in place. Retell integration and end-to-end validation are still pending. Any result described below is a target acceptance criterion until a real Retell run is captured.
 
 ## The customer problem
 
@@ -191,9 +191,9 @@ uv run pytest
 
 ## Development status
 
-The FastAPI foundation, typed settings, health endpoint, static-asset mounting, SQLite calendar schema, deterministic demo seed/reset, calendar availability lookup, idempotent booking, and sanitized request-event timeline are in place. Retell integration and Railway deployment remain pending.
+The FastAPI foundation, typed settings, health endpoint, static-asset mounting, SQLite calendar schema, deterministic demo seed/reset, calendar availability lookup, idempotent booking, sanitized request-event timeline, and lost-response Failure Lab are in place. Retell integration and Railway deployment remain pending.
 
-Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 007: Implement the lost-response failure mode](docs/tasks/007-implement-lost-response-mode.md).
+Work is tracked through atomic Markdown files in [docs/tasks](docs/tasks/README.md). Continue with [Task 008: Verify Retell custom-function requests](docs/tasks/008-verify-retell-webhooks.md).
 
 ## References
 
