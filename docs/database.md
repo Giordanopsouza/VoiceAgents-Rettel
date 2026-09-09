@@ -57,7 +57,7 @@ Invariants the schema must enforce, including under overlapping requests:
 - `appointment.slot_id` references `appointment_slot.id` (`ON DELETE RESTRICT`).
 - `idempotency_record.appointment_id` references `appointment.id` (`ON DELETE RESTRICT`).
 
-`appointment_slot.status` is the flag availability and the dashboard read. The partial unique index is the booking lock. Both change in the same transaction.
+`appointment_slot.status` is the flag availability and the dashboard read. `GET /api/availability?date=YYYY-MM-DD` returns only `available` rows for 2026-09-14 or 2026-09-15, using the slot's stable ID and ISO-8601 UTC timestamps. The partial unique index is the booking lock. Both change in the same transaction.
 
 Quick reference
 

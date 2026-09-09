@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import sessionmaker
 
+from app.availability import AvailabilityQueryError, list_available_slots
 from app.db import init_db
 from app.seed import reset_calendar, schedule_payload, seed_if_empty
 from app.settings import Settings, get_settings
@@ -36,6 +37,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @application.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @application.get("/api/availability")
+    def get_availability(request: Request, date: str | None = None) -> dict:
+        try:
+            with request.app.state.session_factory() as session:
+                return list_available_slots(session, date)
+        except AvailabilityQueryError as exc:
+            raise HTTPException(
+                status_code=400,
+                detail={"error": exc.error, "message": exc.message},
+            ) from exc
 
     @application.post("/api/demo/reset")
     def reset_demo(request: Request) -> dict:
