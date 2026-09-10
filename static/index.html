@@ -137,10 +137,12 @@
             </ul>
           </div>
           <div class="state-view state-view--ready" data-view="ready" hidden>
-            <p>Schedule loaded. Slot grid will appear here.</p>
+            <div id="schedule-grid" class="schedule-grid"></div>
           </div>
           <div class="state-view state-view--error" data-view="error" hidden>
-            <p role="alert">Could not load the schedule. Try again after reset.</p>
+            <p role="alert" id="schedule-error-message">
+              Could not load the schedule. Try again after reset.
+            </p>
           </div>
           <div class="panel__actions">
             <button
@@ -200,7 +202,9 @@
             </p>
           </div>
           <div class="state-view state-view--error" data-view="error" hidden>
-            <p role="alert">Could not read Failure Lab status from the server.</p>
+            <p role="alert" id="failure-lab-error-message">
+              Could not read Failure Lab status from the server.
+            </p>
           </div>
         </div>
       </section>
