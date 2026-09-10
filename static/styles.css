@@ -352,6 +352,10 @@ p {
   cursor: not-allowed;
 }
 
+.toggle:has(input:not(:disabled)) {
+  cursor: pointer;
+}
+
 .toggle input {
   position: absolute;
   opacity: 0;
@@ -393,6 +397,59 @@ p {
 
 .panel--failure-lab .panel__body {
   background: linear-gradient(180deg, var(--color-warning-soft), transparent);
+}
+
+.schedule-grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.schedule-day h3 {
+  margin-bottom: var(--space-3);
+  font-size: 1rem;
+}
+
+.slot-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.slot {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, auto) 1fr auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+}
+
+.slot--available {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.slot--occupied {
+  color: var(--color-ink-muted);
+  background: rgb(200 192 176 / 18%);
+}
+
+.slot__time {
+  font-weight: 700;
+}
+
+.slot__status {
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.slot__id {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
 }
 
 .timeline-list {

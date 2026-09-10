@@ -75,3 +75,20 @@ def test_dashboard_includes_accessibility_affordances():
     assert 'aria-live="polite"' in html
     assert 'role="switch"' in html
     assert "prefers-reduced-motion" in client.get("/static/styles.css").text
+
+
+def test_dashboard_schedule_and_failure_lab_have_live_hooks():
+    html = client.get("/").text
+    script = client.get("/static/dashboard.js").text
+
+    assert 'id="schedule-grid"' in html
+    assert 'id="schedule-error-message"' in html
+    assert 'id="reset-schedule-button"' in html
+    assert 'id="failure-lab-switch"' in html
+    assert 'id="failure-lab-error-message"' in html
+    assert 'id="failure-lab-help"' in html
+    assert "/api/schedule" in script
+    assert "/api/failure-lab" in script
+    assert "/api/demo/reset" in script
+    assert "busy" in script
+    assert "Traceback" not in script

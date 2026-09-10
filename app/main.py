@@ -74,6 +74,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 detail={"error": exc.error, "message": exc.message},
             ) from exc
 
+    @application.get("/api/schedule")
+    def get_schedule(request: Request) -> dict:
+        with request.app.state.session_factory() as session:
+            return schedule_payload(session)
+
     @application.get("/api/events")
     def get_events(request: Request) -> dict:
         with request.app.state.session_factory() as session:
