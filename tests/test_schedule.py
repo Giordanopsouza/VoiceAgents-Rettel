@@ -79,7 +79,7 @@ def test_schedule_http_does_not_write_timeline_events(tmp_path: Path):
         events = client.get("/api/events")
 
     assert lookup.status_code == 200
-    assert events.json() == {"events": []}
+    assert events.json()["events"] == []
 
 
 def test_dirty_calendar_is_visible_on_schedule_read(tmp_path: Path):

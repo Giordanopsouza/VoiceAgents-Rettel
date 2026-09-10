@@ -233,12 +233,10 @@
             </p>
           </div>
           <div class="state-view state-view--ready" data-view="ready" hidden>
-            <ol class="timeline-list" id="timeline-list" aria-label="Request events">
-              <li>Events will stream here during a demo.</li>
-            </ol>
+            <ol class="timeline-list" id="timeline-list" aria-live="polite" aria-label="Request events"></ol>
           </div>
           <div class="state-view state-view--error" data-view="error" hidden>
-            <p role="alert">Could not load the event timeline.</p>
+            <p role="alert" id="timeline-error-message">Could not load the event timeline.</p>
           </div>
         </div>
       </section>
@@ -274,7 +272,7 @@
             <p class="result-summary" id="result-summary" aria-live="polite"></p>
           </div>
           <div class="state-view state-view--error" data-view="error" hidden>
-            <p role="alert">
+            <p role="alert" id="result-error-message">
               Incomplete or contradictory evidence. No success claim is shown.
             </p>
           </div>

@@ -1,5 +1,7 @@
 const PANEL_STATES = ["empty", "loading", "ready", "error"];
 const SCHEDULE_POLL_MS = 2000;
+const EVIDENCE_POLL_MS = 1000;
+const DUPLICATE_PREVENTED = "2 API attempts · 1 appointment · duplicate prevented";
 const operatorBusy = {
   failureLab: false,
   reset: false,
@@ -190,6 +192,126 @@ function renderSchedule(payload) {
   }
 }
 
+function renderAttempts(attempts) {
+  const list = document.getElementById("timeline-list");
+  if (!list) {
+    return;
+  }
+
+  list.replaceChildren();
+  for (const attempt of attempts) {
+    const item = document.createElement("li");
+    item.className = `timeline-item timeline-item--${attempt.kind ?? "unknown"}`;
+
+    const heading = document.createElement("p");
+    heading.className = "timeline-item__heading";
+    heading.textContent = `Attempt ${attempt.attempt_number} · ${attempt.kind} · +${attempt.relative_s}s`;
+
+    const outcome = document.createElement("p");
+    outcome.className = "timeline-item__outcome";
+    outcome.textContent = attempt.outcome ?? "in progress";
+
+    const meta = document.createElement("p");
+    meta.className = "timeline-item__meta";
+    const details = [];
+    if (attempt.idempotency_key_short) {
+      details.push(attempt.idempotency_key_short);
+    }
+    details.push(attempt.appointment_id || "no appointment ID");
+    meta.textContent = details.join(" · ");
+
+    item.append(heading, outcome, meta);
+    list.append(item);
+  }
+}
+
+function renderReliability(reliability) {
+  const panel = document.querySelector('[data-panel="reliability-result"]');
+  const summary = document.getElementById("result-summary");
+  const state = reliability?.state;
+  const headline = reliability?.headline ?? null;
+
+  if (summary) {
+    summary.textContent = "";
+    delete summary.dataset.result;
+  }
+
+  if (state === "duplicate_prevented" && headline === DUPLICATE_PREVENTED) {
+    if (summary) {
+      summary.textContent = headline;
+      summary.dataset.result = "duplicate_prevented";
+    }
+    setPanelState(panel, "ready");
+    return;
+  }
+
+  if (state === "booked" && headline && headline !== DUPLICATE_PREVENTED) {
+    if (summary) {
+      summary.textContent = headline;
+      summary.dataset.result = "booked";
+    }
+    setPanelState(panel, "ready");
+    return;
+  }
+
+  if (state === "incomplete") {
+    setPanelState(panel, "loading");
+    return;
+  }
+
+  if (state === "failed") {
+    const errorNode = document.getElementById("result-error-message");
+    if (errorNode) {
+      errorNode.textContent =
+        "Incomplete or contradictory evidence. No success claim is shown.";
+    }
+    setPanelState(panel, "error");
+    return;
+  }
+
+  setPanelState(panel, "empty");
+}
+
+async function refreshEvidence({ showLoading = false } = {}) {
+  const timeline = document.querySelector('[data-panel="timeline"]');
+  if (showLoading) {
+    setPanelState(timeline, "loading");
+  }
+  try {
+    const payload = await requestJson("/api/events");
+    const attempts = payload.attempts ?? [];
+    if (attempts.length === 0) {
+      setPanelState(timeline, "empty");
+    } else {
+      renderAttempts(attempts);
+      setPanelState(timeline, "ready");
+    }
+    renderReliability(payload.reliability);
+  } catch (error) {
+    showPanelError(
+      timeline,
+      "timeline-error-message",
+      error,
+      "Could not load the event timeline."
+    );
+    const result = document.querySelector('[data-panel="reliability-result"]');
+    const errorNode = document.getElementById("result-error-message");
+    if (errorNode) {
+      errorNode.textContent = errorFromUnknown(
+        error,
+        "Could not calculate a result from events."
+      );
+    }
+    if (result) {
+      const summary = document.getElementById("result-summary");
+      if (summary) {
+        summary.textContent = "";
+      }
+      setPanelState(result, "error");
+    }
+  }
+}
+
 function applyFailureLabSnapshot(snapshot) {
   const switchEl = document.getElementById("failure-lab-switch");
   const help = document.getElementById("failure-lab-help");
@@ -314,6 +436,7 @@ async function resetSchedule() {
     const payload = await requestJson("/api/demo/reset", { method: "POST" });
     renderSchedule(payload);
     setPanelState(panel, "ready");
+    await refreshEvidence();
     setDemoBanner("ready", "Demo calendar restored to the seeded schedule.");
   } catch (error) {
     showPanelError(
@@ -351,12 +474,21 @@ async function initializeDashboard() {
   resetButton?.addEventListener("click", resetSchedule);
   switchEl?.addEventListener("change", toggleFailureLab);
 
-  await Promise.all([refreshSchedule({ showLoading: true }), loadFailureLab()]);
+  await Promise.all([
+    refreshSchedule({ showLoading: true }),
+    loadFailureLab(),
+    refreshEvidence(),
+  ]);
   window.setInterval(() => {
     if (!document.hidden && !operatorBusy.reset) {
       refreshSchedule();
     }
   }, SCHEDULE_POLL_MS);
+  window.setInterval(() => {
+    if (!document.hidden && !operatorBusy.reset) {
+      refreshEvidence();
+    }
+  }, EVIDENCE_POLL_MS);
 }
 
 window.DashboardShell = {

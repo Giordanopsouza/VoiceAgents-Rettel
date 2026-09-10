@@ -12,6 +12,7 @@ from app.availability import AvailabilityQueryError, list_available_slots
 from app.db import init_db
 from app.events import list_request_events
 from app.failure_lab import FailureLab, FailureLabToggle
+from app.reliability import dashboard_evidence
 from app.retell_auth import retell_router
 from app.retell_availability import register_retell_availability
 from app.retell_booking import register_retell_booking
@@ -82,7 +83,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @application.get("/api/events")
     def get_events(request: Request) -> dict:
         with request.app.state.session_factory() as session:
-            return {"events": list_request_events(session)}
+            return dashboard_evidence(list_request_events(session))
 
     @application.get("/api/failure-lab")
     def get_failure_lab(request: Request) -> dict:
