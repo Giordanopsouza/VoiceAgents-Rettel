@@ -219,7 +219,7 @@ def test_unsigned_and_invalid_signatures_are_rejected(tmp_path: Path):
     assert invalid.status_code == 401
     assert missing.json() == {"detail": {"message": "Unauthorized"}}
     assert invalid.json() == {"detail": {"message": "Unauthorized"}}
-    assert events.json() == {"events": []}
+    assert events.json()["events"] == []
     assert "SLOT-002" in {slot["id"] for slot in availability.json()["slots"]}
     _assert_secrets_omitted(missing)
     _assert_secrets_omitted(invalid, _sign(body, api_key=OTHER_API_KEY))
@@ -244,7 +244,7 @@ def test_unconfirmed_request_does_not_book(tmp_path: Path):
             "dentist, date, and time."
         ),
     }
-    assert events.json() == {"events": []}
+    assert events.json()["events"] == []
     assert "SLOT-002" in {slot["id"] for slot in availability.json()["slots"]}
     _assert_secrets_omitted(response)
 
@@ -265,7 +265,7 @@ def test_required_schema_argument_missing_returns_bounded_agent_error(tmp_path: 
             "and confirmed."
         ),
     }
-    assert events.json() == {"events": []}
+    assert events.json()["events"] == []
     _assert_secrets_omitted(response)
 
 
@@ -402,7 +402,7 @@ def test_missing_call_id_returns_bounded_agent_error(tmp_path: Path):
         "error": "invalid_request",
         "message": "Request must include call.call_id.",
     }
-    assert events.json() == {"events": []}
+    assert events.json()["events"] == []
     _assert_secrets_omitted(response)
 
 

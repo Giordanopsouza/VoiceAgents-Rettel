@@ -92,3 +92,16 @@ def test_dashboard_schedule_and_failure_lab_have_live_hooks():
     assert "/api/demo/reset" in script
     assert "busy" in script
     assert "Traceback" not in script
+
+
+def test_dashboard_timeline_and_result_have_live_hooks():
+    html = client.get("/").text
+    script = client.get("/static/dashboard.js").text
+
+    assert 'id="timeline-list"' in html
+    assert 'id="timeline-error-message"' in html
+    assert 'id="result-summary"' in html
+    assert 'id="result-error-message"' in html
+    assert "/api/events" in script
+    assert "2 API attempts · 1 appointment · duplicate prevented" in script
+    assert "duplicate_prevented" in script

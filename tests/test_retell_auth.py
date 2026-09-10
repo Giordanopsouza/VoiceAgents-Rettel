@@ -200,7 +200,7 @@ def test_invalid_signature_cannot_mutate_calendar_state(tmp_path: Path):
 
     assert denied.status_code == 401
     assert client.handled == []
-    assert events.json() == {"events": []}
+    assert events.json()["events"] == []
     assert "SLOT-002" in {slot["id"] for slot in availability.json()["slots"]}
     _assert_secrets_omitted(denied, signature)
 

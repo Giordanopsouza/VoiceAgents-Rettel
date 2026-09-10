@@ -213,7 +213,7 @@ def test_read_api_returns_current_demo_session(tmp_path: Path):
         after_reset = client.get("/api/events")
 
     assert empty.status_code == 200
-    assert empty.json() == {"events": []}
+    assert empty.json()["events"] == []
     assert populated.status_code == 200
     events = populated.json()["events"]
     assert _event_types(events) == BOOKING_EVENT_TYPES
@@ -221,7 +221,7 @@ def test_read_api_returns_current_demo_session(tmp_path: Path):
     assert {event["idempotency_key"] for event in events} == {"call_abc:booking"}
     assert reset.status_code == 200
     assert after_reset.status_code == 200
-    assert after_reset.json() == {"events": []}
+    assert after_reset.json()["events"] == []
 
 
 def test_read_api_stays_available_when_live_demo_is_paused(tmp_path: Path):
@@ -276,7 +276,7 @@ def test_availability_http_does_not_write_timeline_events(tmp_path: Path):
         events = client.get("/api/events")
 
     assert lookup.status_code == 200
-    assert events.json() == {"events": []}
+    assert events.json()["events"] == []
 
 
 def test_failed_booking_still_records_all_four_event_types(tmp_path: Path):

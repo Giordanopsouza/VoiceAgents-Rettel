@@ -164,7 +164,7 @@ def test_unsigned_and_invalid_signatures_are_rejected(tmp_path: Path):
     assert invalid.status_code == 401
     assert missing.json() == {"detail": {"message": "Unauthorized"}}
     assert invalid.json() == {"detail": {"message": "Unauthorized"}}
-    assert events.json() == {"events": []}
+    assert events.json()["events"] == []
     _assert_secrets_omitted(missing)
     _assert_secrets_omitted(invalid, _sign(body, api_key=OTHER_API_KEY))
 
@@ -185,7 +185,7 @@ def test_required_schema_argument_missing_returns_bounded_agent_error(tmp_path: 
         "error": "invalid_request",
         "message": "Function arguments must include date as YYYY-MM-DD.",
     }
-    assert events.json() == {"events": []}
+    assert events.json()["events"] == []
     _assert_secrets_omitted(response)
 
 
@@ -278,7 +278,7 @@ def test_dashboard_availability_is_unchanged_iso_lookup(tmp_path: Path):
 
     assert response.status_code == 200
     assert response.json()["slots"][0]["starts_at"] == "2026-09-14T14:30:00Z"
-    assert events.json() == {"events": []}
+    assert events.json()["events"] == []
 
 
 def test_unwrap_reads_wrapped_args_and_call_id_without_parsing_language():

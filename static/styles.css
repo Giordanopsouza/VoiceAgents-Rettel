@@ -453,9 +453,49 @@ p {
 }
 
 .timeline-list {
+  display: grid;
+  gap: var(--space-3);
   margin: 0;
-  padding-left: 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline-item {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-accent);
+  border-radius: 0.75rem;
+  background: rgb(255 253 248 / 70%);
+}
+
+.timeline-item--booking {
+  border-left-color: var(--color-warning);
+}
+
+.timeline-item__heading,
+.timeline-item__outcome,
+.timeline-item__meta {
+  color: var(--color-ink);
+}
+
+.timeline-item__heading {
+  font-weight: 700;
+}
+
+.timeline-item__outcome,
+.timeline-item__meta {
+  margin-top: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.timeline-item__meta {
   color: var(--color-ink-muted);
+}
+
+.result-summary[data-result="booked"] {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
 }
 
 .result-placeholder {
